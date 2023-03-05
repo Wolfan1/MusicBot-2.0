@@ -48,10 +48,8 @@ class Player:
         self.queue = []
         self.is_playing = False
         self.operating_system = platform.system()
-        self.ffmpeg_options = {
-            'options':'-vn',
-            "before_options":"-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
-        }
+        self.ffmpeg_before_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -fflags +discardcorrupt'
+        self.ffmpeg_options = '-vn'
 
     async def connect(self, ctx):
         join_command = self.bot.get_command('join')
@@ -68,10 +66,9 @@ class Player:
             self.is_playing = True
 
             if self.operating_system == "Windows":
-                print(song.url)
-                self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, executable="C:/FFmpeg/ffmpeg.exe", options=self.ffmpeg_options))
+                self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, executable="C:/FFmpeg/ffmpeg.exe", options=self.ffmpeg_options, before_options=self.ffmpeg_before_options))
             elif self.operating_system == "Linux":
-                self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, options=self.ffmpeg_options))
+                self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, options=self.ffmpeg_options, before_options=self.ffmpeg_before_options))
 
 
             while self.is_playing:
