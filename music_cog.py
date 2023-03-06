@@ -32,10 +32,10 @@ class Music(commands.Cog):
             await message.edit(content=f"Added ***{song.title}*** to the queue")
             await ctx.message.add_reaction("✅")
 
-            if not self.p.is_playing:
-                await self.p.start_playing()
-            else:
+            if self.p.is_playing:
                 await self.p.add_song(song)
+            else:
+                await self.p.start_playing()
 
         else:
             await message.edit(content=f"Failed to add song to queue")
@@ -64,16 +64,20 @@ class Player:
         while len(self.queue) != 0:
             song = self.queue.pop(0)
             self.is_playing = True
+            print("self.is_playing True")
 
             if self.operating_system == "Windows":
                 self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, executable="C:/FFmpeg/ffmpeg.exe", options=self.ffmpeg_options, before_options=self.ffmpeg_before_options))
             elif self.operating_system == "Linux":
                 self.voice_client.play(discord.FFmpegPCMAudio(source=song.url, options=self.ffmpeg_options, before_options=self.ffmpeg_before_options))
 
+            print("Begin Playing")
 
-            while self.is_playing:
+            while self.voice_client.is_playing():
+                print(".", end="")
                 await asyncio.sleep(.5)
         
+        print("self.is_playing False")
         self.is_playing = False
 
 
